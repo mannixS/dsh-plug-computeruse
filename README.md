@@ -190,7 +190,19 @@ A live check against a real desktop (read-only calls plus the calculator — it 
 $env:ELECTRON_RUN_AS_NODE='1'; & $env:DSH_NODE_EXECUTABLE test/integration-live.mjs
 ```
 
-Covered by the live check: whole-desktop capture allowed on `desktop` scope, refused on `window` scope, other apps refused, approval returns `ask` for state-changing calls and allows read-only ones, and the screenshot directory is empty after a turn ends.
+Covered by the live check: whole-desktop capture allowed on `desktop` scope, refused on `window` scope, other apps refused, approval returns `ask` for state-changing calls and allows read-only ones, and the screenshot directory is empty after a turn ends. On a locked workstation the capture steps are reported as skipped instead of failing.
+
+### Releasing
+
+Pushing a version tag publishes to npm automatically. The workflow verifies the tag matches `package.json`, runs the checks above, refuses to ship a package containing `node_modules`, and then publishes:
+
+```sh
+# bump "version" in package.json first
+git tag -a v1.3.2 -m "v1.3.2"
+git push origin main --follow-tags
+```
+
+An ordinary commit to `main` never publishes: npm cannot overwrite a version, so releasing stays a deliberate act.
 
 ---
 

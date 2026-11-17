@@ -191,7 +191,19 @@ pnpm test          # 74 项单元测试
 $env:ELECTRON_RUN_AS_NODE='1'; & $env:DSH_NODE_EXECUTABLE test/integration-live.mjs
 ```
 
-联调覆盖：`desktop` 范围允许整屏、`window` 范围拒绝整屏、跨应用被拒、修改类操作返回 `ask` 而只读放行、回合结束后截图目录为空。
+联调覆盖：`desktop` 范围允许整屏、`window` 范围拒绝整屏、跨应用被拒、修改类操作返回 `ask` 而只读放行、回合结束后截图目录为空。电脑锁屏时会把截图相关步骤标记为跳过，而不是报失败。
+
+### 发版
+
+推送版本 tag 会自动发布到 npm。工作流会校验 tag 与 `package.json` 版本一致、跑完上面的检查、拒绝打包含 `node_modules` 的产物，然后发布：
+
+```sh
+# 先改 package.json 里的 version
+git tag -a v1.3.2 -m "v1.3.2"
+git push origin main --follow-tags
+```
+
+普通提交到 `main` 不会触发发布：npm 的版本号不可覆盖，所以发版必须是一个明确的动作。
 
 ---
 

@@ -156,11 +156,32 @@ The driver is bundled, but the operating system still has the final say:
 
 ---
 
+## If enabling fails with EPERM
+
+A rare install problem shows up as:
+
+```
+启用失败: EPERM: operation not permitted, realpath
+'...\node_modules\dsh-plug-computeruse\node_modules\.pnpm\...'
+```
+
+That is a **stale nested `node_modules`** inside the plugin folder, usually left by an earlier install of an older copy. Its symlinks point at packages the profile root already provides, and Node cannot traverse them.
+
+From `1.3.1` the plugin checks this at activation and tells you the exact folder to remove. To repair manually:
+
+1. Disable the plugin in **Plugins**.
+2. Delete `<profile>\node_modules\dsh-plug-computeruse\node_modules`.
+3. Enable the plugin again.
+
+The profile root already carries every dependency, so nothing needs reinstalling. `cua_driver` with `action: "status"` reports `Installation: dependencies resolve` on a healthy install.
+
+---
+
 ## Development
 
 ```sh
 pnpm run check     # syntax check every module
-pnpm test          # 62 unit tests
+pnpm test          # 74 unit tests
 ```
 
 A live check against a real desktop (read-only calls plus the calculator — it never types into a chat window):

@@ -157,11 +157,32 @@ Use get_window_state on the pinned app instead, or set scope to "desktop" in the
 
 ---
 
+## 启用时报 EPERM 怎么办
+
+少数情况下启用插件会失败，报错形如：
+
+```
+启用失败: EPERM: operation not permitted, realpath
+'...\node_modules\dsh-plug-computeruse\node_modules\.pnpm\...'
+```
+
+这是插件目录里残留了一份**嵌套的 `node_modules`**，通常由早前安装的旧版本留下。它的符号链接指向的包，其实 profile 根目录已经有了，但 Node 无法穿过这些链接读取。
+
+从 `1.3.1` 起，插件会在启用时自检，并直接告诉你要删哪个目录。手动修复步骤：
+
+1. 在 **插件** 页停用该插件。
+2. 删除 `<profile>\node_modules\dsh-plug-computeruse\node_modules`。
+3. 重新启用插件。
+
+profile 根目录已包含全部依赖，不需要重装任何东西。健康安装时，`cua_driver` 的 `action: "status"` 会显示 `Installation: dependencies resolve`。
+
+---
+
 ## 开发
 
 ```sh
 pnpm run check     # 语法检查所有模块
-pnpm test          # 62 项单元测试
+pnpm test          # 74 项单元测试
 ```
 
 真实桌面联调（只做只读调用和计算器操作，不会往聊天窗口里输入任何内容）：

@@ -26,6 +26,7 @@ import { createBackend, IN_PROCESS_TOOLS, loadSdk, normalizeResult } from './src
 import { Config } from './src/config.js'
 import { installHooks } from './src/hooks.js'
 import { projectImages } from './src/images.js'
+import { checkInstallation } from './src/preflight.js'
 import { createScreenshotJanitor } from './src/screenshots.js'
 import { createScopeGate, needsApproval, parseApproval, parseScope } from './src/scope.js'
 import { unwrapVolatile, unwrapVolatileDeep } from './src/volatile.js'
@@ -137,6 +138,31 @@ function validateArgs(args) {
 export function apply(ctx, rawConfig = {}) {
   // Fail loudly at activation on an unusable configured row.
   resolveConfig(rawConfig)
+
+  /**
+   * Check that the bundled dependencies resolve, and explain a broken install
+   * in terms the user can act on.
+   *
+   * A stale nested `node_modules` makes Node fail with a bare EPERM naming a
+   * long path; this turns that into the folder to delete. The check is
+   * deliberately non-fatal: `apply` returns, the tool still registers, and the
+   * first call reports the same message, so a repair never requires guessing.
+   */
+  let installFailure
+  void checkInstallation()
+    .then(result => {
+      if (!result.ok) {
+        installFailure = result.message
+        ctx.logger?.error?.(result.message)
+      }
+    })
+    .catch(() => {
+      // A failed check must not break activation.
+    })
+
+  const requireHealthyInstall = () => {
+    if (installFailure !== undefined) throw new Error(installFailure)
+  }
 
   /**
    * The settings namespace the Host actually serves this row under.
@@ -265,9 +291,15 @@ export function apply(ctx, rawConfig = {}) {
           `Focus cursor: ${config.showFocusCursor ? 'on' : 'off'}`,
           `Screenshot retention: ${config.screenshotRetentionMs === 0 ? 'until turn end' : `${Math.round(config.screenshotRetentionMs / 1000)}s`}`,
         ]
+        if (installFailure !== undefined) {
+          lines.push('', 'Installation problem:', installFailure)
+        } else {
+          lines.push('Installation: dependencies resolve')
+        }
         return { text: lines.join('\n'), imageCount: 0 }
       }
       if (args.action === 'list_tools') {
+        requireHealthyInstall()
         const runtimeTools = await backend.listRuntimeTools()
         const names = runtimeTools !== undefined && runtimeTools.length > 0 ? runtimeTools : IN_PROCESS_TOOLS
         return {
@@ -290,6 +322,10 @@ export function apply(ctx, rawConfig = {}) {
           : '\n\nScope: this instance may drive the whole desktop.'
         return { text: `${described}${scopeNote}`, imageCount: 0 }
       }
+
+      // A broken install must not reach the driver: the failure would surface as
+      // an unexplained EPERM instead of the repair instructions.
+      requireHealthyInstall()
 
       const session = args.session ?? config.session
       let callArguments = { ...(args.arguments ?? {}) }

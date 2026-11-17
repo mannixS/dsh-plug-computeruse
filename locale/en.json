@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Cua computer control",
+    "description": "Bundles the Cua Driver core, so no separate driver install is needed to operate Windows, macOS and Linux desktops. Change the control scope (whole desktop or one app), the confirmation policy for actions, the focus cursor, screenshot retention and the call timeout under Settings → Cua computer control; changes apply immediately. Restrict control and screenshots to one app, require confirmation for state-changing actions, clean up captured screenshots automatically, and show a focus cursor over the target window. Screenshots and action results are sent to the selected model; operating-system permissions are still granted by the user and never bypassed."
+  }
+}

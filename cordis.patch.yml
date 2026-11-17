@@ -1,0 +1,10 @@
+# Register the Cua computer-use tool and its settings page.
+- insert:
+    - id: dsh-cua
+      name: dsh-plug-computeruse
+      config:
+        scope: desktop
+        approval: mutations
+        screenshotRetentionMs: 900000
+        screenshotSweepMs: 60000
+        showFocusCursor: true

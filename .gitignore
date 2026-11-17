@@ -26,3 +26,4 @@ Thumbs.db
 
 # Local publish notes (not part of the package)
 PUBLISH.md
+PUBLISH-NPM.md

@@ -16,7 +16,18 @@
 
 ## 安装与启用
 
-在 DSH 的 **Plugins** 页安装本目录并启用，然后**在新会话**中使用。首次安装会安装 `@trycua/cua-driver` 及其平台二进制包（约 28 MB），不需要下载安装脚本、配 PATH、启 daemon 或连接 MCP。
+**方式一：从 npm 安装**（发布后可用）
+
+```sh
+# 在 DSH 的 Plugins 页「添加插件」里填包名
+dsh-plug-computeruse
+```
+
+**方式二：从本目录安装**
+
+在 DSH 的 **Plugins** 页选择「添加插件」，填入本仓库的绝对路径或 GitHub 地址。
+
+启用后**新开一个会话**再使用。首次安装会安装 `@trycua/cua-driver` 及其平台二进制包（约 28 MB），不需要下载安装脚本、配 PATH、启 daemon 或连接 MCP。
 
 ## 在哪里改设置
 
@@ -24,9 +35,7 @@
 
 在设置页里可以直接改控制范围、固定应用、审批模式、焦点光标、截图保留与超时，点「保存」后**立即生效**，不需要重启 DSH，也不需要新开会话。
 
-实现方式（供排查参考）：配置字段全部用 `schemastery` 的 `.volatile()` 标记，页面通过 `ctx.configForms` 读写。普通字段无法这样写——DSH 的设置写入会以 “no volatile fields” 拒绝，而客户端 `set()` 仍然 resolve，表现为「显示已保存但静默回滚」。写入使用 `mutate([{op:'set', path:[field], value}])`；命名空间取自 `ctx.fiber.entry.options.id`（profile 可能把它挂成 `include:dsh-cua`），由宿主通过 index 注入传给页面。
-
-也可以直接改配置文件 `~/.dsh/profiles/<profile>/cordis.patch.yml` 的 `dsh-cua` 行，改动按 Loader 的常规生命周期生效。
+也可以直接改配置文件 `~/.dsh/profiles/<profile>/cordis.patch.yml` 里 `id: dsh-cua` 那一行，改动按 Loader 的常规生命周期生效。
 
 ## 截图范围（scope）
 
@@ -145,13 +154,14 @@ Use get_window_state on the pinned app instead, or set scope to "desktop" in the
 ## 验证
 
 ```sh
-npm run check
-node --test --experimental-test-isolation=none test/*.test.js
+pnpm run check
+pnpm test
+# 真实桌面联调（只读 + 计算器，不发消息）
 $env:ELECTRON_RUN_AS_NODE='1'; & $env:DSH_NODE_EXECUTABLE test/integration-live.mjs
 ```
 
-- 37 项单元测试覆盖结果归一化、截图生命周期、范围匹配与审批分类。
-- 联调脚本在真实桌面验证：桌面范围允许整屏、窗口范围拒绝整屏并拒绝其他应用、审批钩子对修改类操作返回 `ask` 而对只读放行、`turn/end` 后截图目录清空。测试只使用计算器与只读接口。
+- 62 项单元测试覆盖结果归一化、截图生命周期、范围匹配、审批分类、配置 schema 与 volatile 解包。
+- 联调脚本在真实桌面验证：桌面范围允许整屏、窗口范围拒绝整屏并拒绝其他应用、审批钩子对修改类操作返回 `ask` 而对只读放行、回合结束时截图目录清空。
 
 ## 限制
 

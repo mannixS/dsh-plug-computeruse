@@ -23,3 +23,6 @@ Thumbs.db
 # Local environment
 .env
 .env.local
+
+# Local publish notes (not part of the package)
+PUBLISH.md

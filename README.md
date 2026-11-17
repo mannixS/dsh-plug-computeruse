@@ -1,5 +1,8 @@
 # Cua computer control for DeepSeek Harness
 
+[![npm version](https://img.shields.io/npm/v/dsh-plug-computeruse.svg)](https://www.npmjs.com/package/dsh-plug-computeruse)
+[![license](https://img.shields.io/npm/l/dsh-plug-computeruse.svg)](LICENSE)
+
 **English** · [简体中文](README.zh.md)
 
 Let your DeepSeek Harness agent actually use the computer — click, type, read the screen — on Windows, macOS and Linux.

@@ -1,5 +1,8 @@
 # Cua 电脑控制 · DeepSeek Harness 插件
 
+[![npm version](https://img.shields.io/npm/v/dsh-plug-computeruse.svg)](https://www.npmjs.com/package/dsh-plug-computeruse)
+[![license](https://img.shields.io/npm/l/dsh-plug-computeruse.svg)](LICENSE)
+
 [English](README.md) · **简体中文**
 
 让你的 DeepSeek Harness Agent 真正会用电脑——在 Windows、macOS 和 Linux 上点击、输入、看懂屏幕。
